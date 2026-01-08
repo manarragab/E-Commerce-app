@@ -1,0 +1,5 @@
+class CustomKeys{
+  static const String googleKey = 'AIzaSyA-BgpbnL-cpX8byQIW1LEaJ3ay3db9UVQ';
+  static const String apiKey="ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2TVRBM05EY3hNU3dpYm1GdFpTSTZJbWx1YVhScFlXd2lmUS5IUFdxQ3dsZ3BFTUN2NnVCNDFMc1Zlc3RXRERlbUo4X3h0YXAzd2laSDB1aWdQcnFFRjZQREZnbEctcmhNaW1BWmtVYV9MTHBMYTA4THRnSk9EQWFCdw==";
+
+}
