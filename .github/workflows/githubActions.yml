@@ -1,4 +1,4 @@
-name: Flutter CI + Firebase App Distribution - Weather App
+name: Flutter CI + Firebase App Distribution - ecommerce App
 
 on:
   push:
@@ -62,3 +62,4 @@ jobs:
 
 
       
+
