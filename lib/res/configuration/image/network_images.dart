@@ -201,6 +201,7 @@ class CustomImageNetwork extends StatelessWidget {
   Widget _buildSvg() {
     if (_isLocal(path)) {
       return SvgPicture.asset(
+        key: ValueKey(path),
         path,
         height: height,
         width: width,
@@ -216,6 +217,7 @@ class CustomImageNetwork extends StatelessWidget {
       padding: padding ?? const EdgeInsets.all(10),
       child: SvgPicture.network(
         _getPath(path),
+        key: ValueKey(path),
         height: height,
         width: width,
         fit: fit,
@@ -236,6 +238,7 @@ class CustomImageNetwork extends StatelessWidget {
           borderRadius: borderRadius,
           image: DecorationImage(
             image: AssetImage(path ),
+           
             fit: fit,
           ),
         ),
@@ -259,9 +262,12 @@ class CustomImageNetwork extends StatelessWidget {
       },
       errorBuilder: (context, error, stackTrace) {
         return onError ??
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: SvgPicture.asset('assets/svg/splash.svg' , colorBlendMode: changeColor ?? BlendMode.clear ,),
+            Container(
+              width: width,
+              height: height,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: SvgPicture.asset('assets/svg/splash.svg',
+               width: 100 , height: 100 , colorBlendMode: changeColor ?? BlendMode.clear ,),
             );
       },
     );

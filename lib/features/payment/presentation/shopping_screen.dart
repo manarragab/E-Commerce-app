@@ -257,8 +257,8 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
               child: MainButton(
                 onPressed: () {
                  final controller=Get.find<PaymentController>();
-                 controller.price = data[3];
-                 Get.toNamed(CustomPage.payPage ,arguments: (int.tryParse(data[3]) ?? 0) * quantity.value);
+                 controller.price = (int.tryParse(data[3]) ?? 0)*quantity.value;
+                 Get.toNamed(CustomPage.payPage ,arguments: (int.tryParse(data[3]) ?? 0)*quantity.value);
                 },
                 title: "Buy Now",
                 height: 50,
@@ -295,7 +295,7 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
                       
                 ),
               ),
-                                  const SizedBox(height: 8),
+               const SizedBox(height: 8),
 
               Text(
                       data[1],
@@ -340,6 +340,35 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
             ),
 
             const SizedBox(height: 20),
+
+            Container(
+              width: Get.width,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.pinkAccent.shade100.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Delivery in",
+                    style: TextStyle(
+                      fontSize: 16,
+                      
+                    ),
+                  ),
+                  Text(
+                    "within 1 Hour",
+                    style: TFonts.montFont(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 30),
           ],
         ),
       ),

@@ -41,8 +41,8 @@ void init(){
 
  String? getToken()  {
   return getStorage.read("token") ;
-
 }
+
 String? getRefreshToken()  {
   return getStorage.read("refresh_token") ;
 }
@@ -60,8 +60,6 @@ String? getRefreshToken()  {
 String getPaymentToken()  {
   return getStorage.read("payment_token");
 }
-
-
 
  void setWishlist(var wishlist ) async {
   await getStorage.write("wishlist", wishlist);

@@ -11,6 +11,8 @@ import 'package:ecommerce_app/data/models/payment/payment_token/order_id/post_or
 import 'package:ecommerce_app/data/models/payment/post_kiosk_payment.dart';
 import 'package:ecommerce_app/features/auth/domain/controller/auth_controller.dart';
 import 'package:ecommerce_app/features/payment/domain/case/payment_cases.dart';
+import 'package:ecommerce_app/features/payment/presentation/widget/alert_box.dart';
+import 'package:ecommerce_app/res/configuration/open_url/launch_url.dart';
 
 class PaymentController extends MainGetxController {
   
@@ -35,7 +37,18 @@ txtFields(){
       email: emailTextField.text,
       phoneNumber: phoneTextField.text,
     );
-postFinalToken.amountCents = int.tryParse(price.toString()) ?? 0;
+    
+  
+  amountTextField.text = price.toString();
+
+  final parsed = int.tryParse(price.toString()) ?? 0;
+  final x = parsed * 100;
+
+  postFinalToken.amountCents = x;
+  postOrderId.amountCents = x.toString();
+   print("amountCentssssssssssss $x");
+
+//postFinalToken.amountCents = int.tryParse(price.toString()) ?? 0;
 }
 
 @override
@@ -91,7 +104,7 @@ Future<void> getOrderId(String idd) async {
   postOrderId.authToken= authToken;
   postOrderId.currency= "EGP";
   postOrderId.apiSource= "INVOICE";
-  
+postOrderId.amountCents =((int.tryParse(amountTextField.text) ?? 0) * 100).toString();
   var response = await sl<PaymentCases>().orderId(postOrderId);
   
   print("amounttttt ${postOrderId.amountCents}");
@@ -206,16 +219,16 @@ billingData();
 }
 
 
-Future<void> visaToken({String idd=''}) async{
-await getAuthToken( idd);
-print('authToken :::::::::::::::::;; $authToken ');
-await getOrderId(idd);
-print('orderId :::::::::::::::::;; $id ');
-await finalPaymentToken(idd ,5268837 );
-print('paymentToken :::::::::::::::::;; $paymentToken ');
-loadingGetxController.hideCustomLoading(idd);
+// Future<void> visaToken({String idd=''}) async{
+// await getAuthToken( idd);
+// print('authToken :::::::::::::::::;; $authToken ');
+// await getOrderId(idd);
+// print('orderId :::::::::::::::::;; $id ');
+// await finalPaymentToken(idd ,5268837 );
+// print('paymentToken :::::::::::::::::;; $paymentToken ');
+// loadingGetxController.hideCustomLoading(idd);
 
-}
+// }
 
 void resetPaymentToken(){
   paymentToken = '';
@@ -272,29 +285,113 @@ serviceCodeWallet = response.data!.id!;
 
 
 
-Future<void> kioskToken({String idd=''}) async{
-await getAuthToken( idd);
-print('authToken :::::::::::::::::;; $authToken ');
-await getOrderId( idd);
-print('orderId :::::::::::::::::;; $id ');
-await finalPaymentToken(idd , 5448944);
-print('paymentToken :::::::::::::::::;; $paymentTokenKioskk ');
-            loadingGetxController.hideCustomLoading(idd);
+// Future<void> kioskToken({String idd=''}) async{
+// await getAuthToken( idd);
+// print('authToken :::::::::::::::::;; $authToken ');
+// await getOrderId( idd);
+// print('orderId :::::::::::::::::;; $id ');
+// await finalPaymentToken(idd , 5448944);
+// print('paymentToken :::::::::::::::::;; $paymentTokenKioskk ');
+//             loadingGetxController.hideCustomLoading(idd);
 
+// }
+
+
+
+// Future<void> walletToken({String idd=''}) async{
+// await getAuthToken( idd);
+// print('authToken :::::::::::::::::;; $authToken ');
+// await getOrderId( idd);
+// print('orderId :::::::::::::::::;; $id ');
+// await finalPaymentToken(idd , 5456542);
+// print('paymentToken :::::::::::::::::;; $paymentTokenWallet ');
+//   loadingGetxController.hideCustomLoading(idd);
+
+// }
+
+
+
+
+Future<bool> _preparePaymentTokens({
+  required String idd,
+  required int integrationId,
+  required Function(String?) onTokenReady,
+}) async {
+  try {
+    loadingGetxController.showCustomLoading(idd);
+
+    // 1. Auth Token
+    await getAuthToken(idd);
+    if (authToken == null) return false;
+
+    // 2. Order ID
+    await getOrderId(idd);
+    if (id == null) return false;
+
+    // 3. Final Payment Token
+    await finalPaymentToken(idd, integrationId);
+    
+    String? token;
+    if (integrationId == 5268837) token = paymentToken;
+    if (integrationId == 5448944) token = paymentTokenKioskk;
+    if (integrationId == 5456542) token = paymentTokenWallet;
+
+    onTokenReady(token);
+    return token != null;
+  } catch (e) {
+    sPrint.error("خطأ في تحضير الدفع: $e" , StackTrace.current);
+    Get.snackbar("خطأ", "حدث خطأ أثناء التحضير للدفع");
+    return false;
+  } finally {
+    loadingGetxController.hideCustomLoading(idd);
+  }
 }
 
 
-
-Future<void> walletToken({String idd=''}) async{
-await getAuthToken( idd);
-print('authToken :::::::::::::::::;; $authToken ');
-await getOrderId( idd);
-print('orderId :::::::::::::::::;; $id ');
-await finalPaymentToken(idd , 5456542);
-print('paymentToken :::::::::::::::::;; $paymentTokenWallet ');
-  loadingGetxController.hideCustomLoading(idd);
-
+Future<void> visaToken({String idd = 'visa'}) async {
+  await _preparePaymentTokens(
+    idd: idd,
+    integrationId: 5268837,
+    onTokenReady: (token) {
+      if (token != null) {
+        CustomLauncher.launchInBrowser(
+          Uri.parse("https://accept.paymob.com/api/acceptance/iframes/957399?payment_token=$token"),
+        );
+      }
+    },
+  );
 }
 
+Future<void> kioskToken({String idd = 'kiosk'}) async {
+  await _preparePaymentTokens(
+    idd: idd,
+    integrationId: 5448944,
+    onTokenReady: (token) async {
+      if (token != null) {
+        paymentTokenKioskk = token;
+        await kioskPayment(idd: idd);
+        if (serviceCodeKiosk != null) {
+          Get.dialog(AlertBox(txt: serviceCodeKiosk.toString()));
+        }
+      }
+    },
+  );
+}
+
+Future<void> walletToken({String idd = 'wallet'}) async {
+  await _preparePaymentTokens(
+    idd: idd,
+    integrationId: 5456542,
+    onTokenReady: (token) async {
+      if (token != null) {
+        paymentTokenWallet = token;
+        await kioskPayment(idd: idd); // نفس الـ endpoint للـ wallet
+        if (serviceCodeWallet != null) {
+          Get.dialog(AlertBox(txt: serviceCodeWallet.toString()));
+        }
+      }
+    },
+  );
+}
 
 }

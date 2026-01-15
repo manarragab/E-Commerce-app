@@ -24,8 +24,7 @@ class AuthCases {
     
   }
 
-   String?getToken() {
-    
+   String? getToken() {
     return _data.getToken();
   }
 

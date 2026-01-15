@@ -31,7 +31,7 @@ final controller = Get.find<PaymentController>();
 // controller.lNameTextField.text =authController.name?.split(' ').skip(1).join(' ') ?? '';
 // controller.emailTextField.text = authController.email ?? '';
   
-    final price = Get.arguments;
+     controller.price = Get.arguments;
 
     return Scaffold(
       appBar: CustomAppBar.appBar(""),
@@ -89,14 +89,16 @@ print("${val} val");
 
         CustomTextField.numberTextField(
           controller: controller.amountTextField,
-       (val) {
+       (_) {
         
-    controller.amountTextField.text = price.toString();
-        val=price;
-  final parsed = int.tryParse(val.trim()) ?? 0; 
-  final x = parsed * 100;
-  controller.postFinalToken.amountCents = x;
-  controller.postOrderId.amountCents = x.toString();
+  //   controller.amountTextField.text = controller.price.toString();
+  //       val= controller.price;
+  //       print("val $val");
+  // final parsed = int.tryParse(val.trim()) ?? 0; 
+  // final x = parsed * 100;
+  // controller.postFinalToken.amountCents = x;
+  // print("amountCentssssssssssss ${controller.postFinalToken.amountCents}");
+  // controller.postOrderId.amountCents = x.toString();
   
        },
             hint: "Budget amount.. LE"
@@ -110,7 +112,7 @@ print("${val} val");
       print("valid ${controller.postFinalToken.billingData.lastName} , ${controller.postFinalToken.billingData?.firstName} , ${controller.postFinalToken.billingData?.email} , ${controller.postFinalToken.billingData?.phoneNumber} , ${controller.postFinalToken.amountCents}");
     
     Get.toNamed(CustomPage.choosePayPage);
-    controller.clearTextFields();
+    //controller.clearTextFields();
      }  
 
         },

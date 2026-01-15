@@ -19,17 +19,13 @@ class HomeBody extends StatelessWidget {
     final HomeController controller = Get.find<HomeController>();
     final SplashController splashController = Get.find<SplashController>();
     final authController= Get.find<AuthController>();
-    return SmartRefresher(
-      enablePullDown: true,
-      onLoading: () async{
-        controller.loadingGetxController.showLoading();
-       await controller.getAllProducts();
-       await controller.getAllCategories();
-       controller.refreshController.loadComplete();
-       controller.loadingGetxController.hideLoading();
+    final _homeRefreshController = RefreshController();
 
-      },
-       controller:  controller.refreshController ,
+    return SmartRefresher(
+  controller: _homeRefreshController,
+  
+  onRefresh: controller.onRefresh,
+ 
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: 
@@ -42,11 +38,11 @@ class HomeBody extends StatelessWidget {
             children: [
               
             const SizedBox(height: 10),
-            CustomTextField.searchField(
-              hint: "Search any Products",
-              (val) {},
-            ),
-            const SizedBox(height: 20),
+            // CustomTextField.searchField(
+            //   hint: "Search any Products",
+            //   (val) {},
+            // ),
+            // const SizedBox(height: 20),
             Row(
               children: [
                 Text(
@@ -54,21 +50,21 @@ class HomeBody extends StatelessWidget {
                   style:
                       TFonts.montFont(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const Spacer(),
-                containerWidget("sort", () {}),
-                const SizedBox(width: 10),
-                containerWidget("filter", () {}),
+                // const Spacer(),
+                // containerWidget("sort", () {}),
+                // const SizedBox(width: 10),
+                // containerWidget("filter", () {}),
               ],
             ),
             const SizedBox(height: 10),
             
-              MainButton(
-                onPressed: () async {
-              print("📙 ResponseModel data: ${authController.email}");
-                
-                },
-                title: "Home Body",
-              ),
+              // MainButton(
+              //   onPressed: () async {
+              // print("📙 ResponseModel data: ${authController.email}");
+              //   Get.toNamed(CustomPage.loginPage);
+              //   },
+              //   title: "Home Body",
+              // ),
       
               const SizedBox(height: 20),
       
@@ -89,107 +85,142 @@ class HomeBody extends StatelessWidget {
             const SizedBox(height: 10),
       
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child:
-               Obx((){
-                final _=splashController.activeIndex.value;
-           final index = splashController.activeIndex.value % controller.allProducts!.length;
-        if(controller.allProducts!.length==0){
-          return Text("Loading...");
-        }
-                return CustomImage.network(              
-                   controller.allProducts?[index].images?[0]?? demoImage,
-                      width: double.infinity,
-                      height: 170,
-                      fit: BoxFit.fill);
-           }),
-                ),
-               
-                 
-      
-            const SizedBox(height: 15),
-        
-            SplashDots(),
-      
-            const SizedBox(height: 20),
-      
+  borderRadius: BorderRadius.circular(10),
+  child: Obx(() {
+    final products = controller.allProducts;
+    final index = splashController.activeIndex.value;
+
+    if (products == null || products.isEmpty) {
+      controller.getAllProducts();
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (index >= products.length) {
+      return const Center(child: Text("Invalid index"));
+    }
+
+    final img = products[index].images?.first;
+
+    if (img == null || img.isEmpty) {
+      return const Center(child: Text("No Image Available"));
+    }
+
+    return  Image.network(
+      img,
+      height: 200,
+      width: Get.width,
+      fit: BoxFit.cover,
+    );
+  }),
+),
+
+const SizedBox(height: 15),
+
+if (controller.allProducts != null &&
+    controller.allProducts!.isNotEmpty &&
+    splashController.activeIndex.value <
+        controller.allProducts!.length &&
+    controller.allProducts![splashController.activeIndex.value]
+        .images
+        ?.isNotEmpty ==
+        true)
+  SplashDots()
+else
+  const SizedBox(),
+
+const SizedBox(height: 20),
+
             Container(
-              height: 70,
-              width: Get.width,
-              decoration: BoxDecoration(
-                color: CustomColors.babyblue,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    spacing: 7,
-                    children: [
-                      SizedBox(height: 5),
-                      Text(
-                        "Deal of the Day",
-                        style: TFonts.montFont(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: CustomColors.white),
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.timer_outlined,
-                            color: CustomColors.white,
-                          ),
-                          Text(
-                            " 22h 55m 20s remaining ",
-                            style: TFonts.montFont(
-                                fontSize: 16, color: CustomColors.white),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                  MainButton(
-                    onPressed: () {},
-                    title: "View All =>",
-                    width: 120,
-                    height: 30,
-                    withShadow: false,
-                    radius: 4,
-                    borderColor: CustomColors.white,
-                    backgroundColor: CustomColors.babyblue,
-                  ),
-                ],
+  height: 80,
+  width: double.infinity, // 👈 safer than Get.width
+  padding: const EdgeInsets.symmetric(horizontal: 15),
+  decoration: BoxDecoration(
+    color: CustomColors.babyblue,
+    borderRadius: BorderRadius.circular(10),
+  ),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Expanded(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Deal of the Day",
+              style: TFonts.montFont(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: CustomColors.white,
               ),
             ),
-         
-      
-              const SizedBox(height: 20),
-      
-              SizedBox(
-                height: Get.height / 3.2,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: controller.allProducts?.length ??0,
-                  itemBuilder: (context, index) {
-                    final product = controller.allProducts?[index] ?? AllProducts();
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: cartWidget(
-                        image: product.images?.first ?? "",
-                        title: product.title ?? "",
-                        description: product.description ?? "",
-                        price: product.price?.toString() ?? "",
-                      ),
-                    );
-                  },
+            const SizedBox(height: 7),
+            Row(
+              children: [
+                const Icon(
+                  Icons.timer_outlined,
+                  color: CustomColors.white,
+                  size: 18,
                 ),
-              ),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    "22h 55m 20s remaining",
+                    overflow: TextOverflow.ellipsis,
+                    style: TFonts.montFont(
+                      fontSize: 16,
+                      color: CustomColors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+
+      MainButton(
+        onPressed: () {},
+        title: "View All →",
+        width: 110,
+        height: 30,
+        withShadow: false,
+        radius: 4,
+        borderColor: CustomColors.white,
+        backgroundColor: CustomColors.babyblue,
+      ),
+    ],
+  ),
+),
+              const SizedBox(height: 20),
+       
+       SizedBox(
+          height: Get.height/3,
+         child: ListView.builder(
+         
+                    scrollDirection: Axis.horizontal,
+                    itemCount: controller.allProducts?.length ??0,
+                    itemBuilder: (context, index) {
+                      final product = controller.allProducts?[index] ?? AllProducts();
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: cartWidget(
+                          image: product.images?.first ?? "",
+                          title: product.title ?? "",
+                          description: product.description ?? "",
+                          price: product.price?.toString() ?? "",
+                          
+                        ),
+                      );
+                    },
+                  
+                ),
+       ),
             SizedBox(height: 20),
       
        Container(
         width: Get.width,
-        height: 100,
+        height: 120,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
       color: CustomColors.grey10,
@@ -205,7 +236,7 @@ class HomeBody extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Special Offer",
+                        Text("Special Offer 10% Off",
                             style: TFonts.montFont(
                                 fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 10),
@@ -218,6 +249,7 @@ class HomeBody extends StatelessWidget {
                         ))
                       ],
                     ),
+
                   )
                 ],
               ),
@@ -225,70 +257,95 @@ class HomeBody extends StatelessWidget {
         
             SizedBox(height: 5),
               
-            Container(
-                height: 150,
-                margin: const EdgeInsets.symmetric(vertical: 20),
-                decoration: BoxDecoration(
-                  color: CustomColors.grey10,
-                  borderRadius: BorderRadius.circular(10),
+           Container(
+  height: 150,
+  margin: const EdgeInsets.symmetric(vertical: 20),
+  decoration: BoxDecoration(
+    color: CustomColors.grey10,
+    borderRadius: BorderRadius.circular(10),
+  ),
+  child: Row(
+    children: [
+      Stack(
+        children: [
+          Container(
+            height: 150,
+            width: 10,
+            color: CustomColors.yellow,
+          ),
+          CustomImage.asset(
+            "assets/images/dots.png",
+            height: 150,
+          ),
+          CustomImage.asset(
+            "assets/images/dots.png",
+            height: 150,
+            width: 150,
+          ),
+          Positioned(
+            top: 5,
+            left: 20,
+            child: CustomImage.asset(
+              "assets/images/shose.png",
+              width: 150,
+              height: 150,
+            ),
+          ),
+        ],
+      ),
+
+      /// 👇 THIS FIXES EVERYTHING
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 30, right: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Flat and Heels",
+                style: TFonts.montFont(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                child: Row(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          height: 150,
-                          width: 10,
-                          decoration: BoxDecoration(
-                            color: CustomColors.yellow,
-                          ),
-                        ),
-                        CustomImage.asset(
-                          "assets/images/dots.png",
-                          height: 150,
-                        ),
-                        CustomImage.asset(
-                          "assets/images/dots.png",
-                          height: 150,
-                          width: 150,
-                        ),
-                        Positioned(
-                          top: 5,
-                          left: 20,
-                          child: CustomImage.asset("assets/images/shose.png",
-                              width: 150, height: 150),
-                        ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Stand a chance to get rewarded",
+                style: TFonts.montFont(
+                  fontSize: 12,
+                  color: CustomColors.grey11,
+                ),
+              ),
+              const Spacer(),
+              Align(
+                alignment: Alignment.centerRight,
+                child: MainButton(
+                  onPressed: () {
+                    controller.title = "Shoes";
+                    Get.toNamed(
+                      CustomPage.productPage,
+                      arguments: [
+                        const ValueKey("Shoes"),
+                        "Shoes",
+                        "id",
                       ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 30),
-                      child: Column(
-                        spacing: 10,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text("Flat and Heels",
-                              style: TFonts.montFont(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text("Stand a chance to get rewarded",
-                              style: TFonts.montFont(
-                                  fontSize: 12, color: CustomColors.grey11)),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 70),
-                            child: MainButton(
-                              onPressed: () {},
-                              title: "Visit Now =>",
-                              width: 130,
-                              height: 30,
-                              withShadow: false,
-                              radius: 4,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )),
-        
+                    );
+                  },
+                  title: "Visit Now →",
+                  width: 130,
+                  height: 30,
+                  withShadow: false,
+                  radius: 4,
+                ),
+              ),
+              SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ),
+    ],
+  ),
+),
             SizedBox(height: 20),
             ],
           )
@@ -328,7 +385,8 @@ class HomeBody extends StatelessWidget {
 controller.selectedSort = "Default";
    // Get.find<HomeController>().onItemTapped(1 , name );
 
-    Get.toNamed(CustomPage.productPage , arguments:   [ValueKey(controller.title) , name ],  
+    Get.toNamed(CustomPage.productPage , arguments:   [ValueKey(controller.title) , name ,
+    ""],  
             );
             },
             child: Container(

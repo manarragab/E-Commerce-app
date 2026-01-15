@@ -170,23 +170,35 @@ login() async {
 
 PostRefreshToken postRefreshToken = PostRefreshToken();
 RefreshTokenResponse refreshTokenResponse = RefreshTokenResponse();
-
-refreshToken() async {
+Future<bool> refreshToken() async {
   try {
-   postRefreshToken.refreshToken = await sl<GetStorageData>().getRefreshToken();
-    var response = await sl<AuthCases>().refreshToken(postRefreshToken);
+    final refreshToken = await sl<GetStorageData>().getRefreshToken();
+    if (refreshToken == null) return false;
 
-    statusError.checkStatus(response, () {
-      refreshTokenResponse = response.data!;
-      Get.snackbar(
-        "Success",
-        response.message ?? "token successfully",
+    postRefreshToken.refreshToken = refreshToken;
+
+    final response = await sl<AuthCases>().refreshToken(postRefreshToken);
+refreshTokenResponse = response.data!;
+    if (response.data != null) {
+      await sl<GetStorageData>().setToken(
+        response.data!.accessToken!,
+        response.data!.refreshToken!,
       );
-    });
+      return true;
+    }
+    return false;
   } catch (e) {
-    Get.snackbar("Error", "Failed to resend token");
+    return false;
   }
 }
+
+
+
+Future<bool> tryAutoLogin() async {
+  return await refreshToken();
+}
+
+
 
 
   loginm() async {
@@ -339,6 +351,9 @@ String? name;
 String? email;
 
 Future<void> getUserInfo() async {
+  if( loginModel.fullName != null && loginModel.email != null){
+    return;
+  }
   loadingGetxController.showLoading();
 
   String? token =  sl<GetStorageData>().getToken();

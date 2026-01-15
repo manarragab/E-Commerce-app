@@ -24,15 +24,13 @@ class _HomeScreenState extends State<HomeScreen> {
   });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return
     GetBuilder<HomeController>(builder: (controller){
       final List<Widget> _pages = [
         const HomeBody(),
-        WishlistBody(
-          ),
+        WishlistBody(),
          CartBody(),
         const SearchBody(),
         const SettingsBody(),
@@ -48,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         showUnselectedLabels: true,
         showSelectedLabels: false,
         
-        type: BottomNavigationBarType.shifting,
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: Theme.of(context).primaryColor,
         unselectedItemColor: Colors.black87,
         selectedIconTheme: IconThemeData(size: 28.sp),
@@ -60,8 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ); }),
       ),  
 
-      appBar: controller.selectedIndex==2? 
-      CustomAppBar.appBar("" , actions: [Icon(Icons.car_repair_outlined)]):
+      appBar: 
        CustomAppBar.homeAppBar(
         onChange: (val) {},
         actionWidget: CircleAvatar(

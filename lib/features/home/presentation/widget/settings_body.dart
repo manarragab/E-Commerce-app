@@ -37,6 +37,7 @@ class _SettingsBodyState extends State<SettingsBody> {
                   authController.name ?? "",
                   style: TFonts.montFont(
                     fontSize: 22,
+                    color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -73,7 +74,7 @@ class _SettingsBodyState extends State<SettingsBody> {
                       color: Colors.orange,
                     ),
                     title: Text(
-                      "Dark Mode",
+                    !controller.isDark ?  "Dark Mode" : "Light Mode",
                       style: TFonts.montFont(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

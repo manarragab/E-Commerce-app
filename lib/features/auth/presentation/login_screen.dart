@@ -95,6 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     authController.postLogin.password =
                         authController.passwordController1.text;
                     authController.login();
+                    authController.refreshToken();
                     }
                 },
                 title: "Login",

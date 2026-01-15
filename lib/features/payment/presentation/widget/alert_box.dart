@@ -9,17 +9,20 @@ final  String? txt;
   Widget build(BuildContext context) {
     final controller = Get.find<PaymentController>();
     return AlertDialog(
+      scrollable: true,
      shape: RoundedRectangleBorder(
        borderRadius: BorderRadius.circular(40),
      ),
     title:
-    Column(children: [
+    Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
       CustomImage.asset('assets/images/correct.png', height: 50, width: 50,),
      Text('Reference Number:'),
      const SizedBox(height: 10),
      Center(
        child: Text(
-         '$txt??""',
+         '${txt}' ,
          style: TFonts.montFont(fontSize: 30, fontWeight: FontWeight.bold),
        ),
      ),
@@ -37,6 +40,7 @@ Center(child: Text(' ${controller.postFinalToken.billingData.email} ', style: TF
         child: Text('OK'),
         onPressed: () {
         Get.back();
+        controller.serviceCodeKiosk = null;
         },
       ), ], 
   );

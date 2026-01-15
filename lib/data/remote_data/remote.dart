@@ -120,7 +120,6 @@ Future<ResponseModel<LoginResponse>> login(PostLogin login) async {
       sPrint.success(data);
       sPrint.info('getting data:: $data');
       final loginResponse = LoginResponse.fromJson(data);
-      sPrint.info('login data from remote:: ${loginResponse.toJson()}');
       return ResponseModel<LoginResponse>(
         status: 1,
         message: "success",

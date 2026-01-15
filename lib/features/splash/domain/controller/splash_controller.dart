@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:ecommerce_app/data/const/export.dart';
+import 'package:ecommerce_app/features/auth/domain/controller/auth_controller.dart';
+import 'package:ecommerce_app/features/home/domain/controller/home_controller.dart';
 import 'package:ecommerce_app/res/router/pages.dart';
 
 class SplashController extends MainGetxController{
@@ -14,8 +16,22 @@ void onInit() {
   timer = Timer.periodic(const Duration(seconds: 5), (timer) {
   next();
     });
+  openHomePage();
 }
 
+  Future<void> openHomePage() async{
+      final authController = Get.put(AuthController());
+      final homeController = Get.put(HomeController());
+             await Future.wait(
+                  [
+                    homeController.getAllCategories(),
+                    homeController.getAllProducts(),
+                    authController.getUserInfo(),
+                  ],
+                );
+      Get.offAllNamed(CustomPage.homePage);
+                   loadingGetxController.hideLoading();
+  }
   @override
   void dispose() {
     timer.cancel();

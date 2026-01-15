@@ -2,6 +2,7 @@ import 'package:ecommerce_app/data/const/export.dart';
 import 'package:ecommerce_app/data/data_sources/get_storage.dart';
 import 'package:ecommerce_app/data/models/categories/get/all_categories.dart';
 import 'package:ecommerce_app/data/models/products/get/all_products.dart';
+import 'package:ecommerce_app/data/remote_data/response_model.dart';
 import 'package:ecommerce_app/domain_data/custom_mixin/custom_state_mixin.dart';
 import 'package:ecommerce_app/features/home/domain/cases/home_case.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -16,22 +17,23 @@ class HomeController extends MainGetxController with CustomStateMixin {
     super.onClose();
   }
 
-
 RxList<Map<String, dynamic>> wishlist = <Map<String, dynamic>>[].obs;
-
 
   @override
   void onInit() {
     super.onInit();
     loadWishlist();
+    sl<GetStorageData>().getWishlist();
+
   }
 
   void loadWishlist() {
     final stored = sl<GetStorageData>().getWishlist();
-    if (stored.isNotEmpty) {
+    if (stored != null) {
 wishlist.assignAll(
   List<Map<String, dynamic>>.from(stored),
 );
+sl<GetStorageData>().setWishlist(wishlist);
     } 
   }
 
@@ -140,6 +142,7 @@ if (!force && allCategories != null && allCategories!.isNotEmpty) {
       controller: refreshController,
       getPage: (r) => r,
       checkIfEmpty: (data) {
+
   if (data == null) return data;
   return data;
 }
@@ -151,6 +154,9 @@ if (!force && allCategories != null && allCategories!.isNotEmpty) {
   }
 
   Future<void> getAllCategories() async {
+    if( allCategories != null && allCategories!.isNotEmpty){
+      return;
+    } 
     loadingGetxController.showLoading();
     final response = await sl<HomeCases>().allCategories();
     print("📙 ResponseModel data: ${response.toJson()}");
@@ -165,6 +171,9 @@ if (!force && allCategories != null && allCategories!.isNotEmpty) {
   }
 
 Future<void> getAllProducts() async {
+  if(  allProducts != null && allProducts!.isNotEmpty){
+      return;
+    }
     loadingGetxController.showLoading();
     final response = await sl<HomeCases>().allProducts();
     print("📙 ResponseModel products data: ${response.toJson()}");
@@ -176,6 +185,30 @@ Future<void> getAllProducts() async {
       print("❌ Failed to load: ${response.message}");
     }
     update();
+  }
+
+Future<void> onRefresh() async {
+    final result = await refreshDataMulti(
+      futureMethods: () => [
+        sl<HomeCases>().allCategories(),
+        sl<HomeCases>().allProducts(),
+        ],
+      controller: refreshController,
+      checkIfEmpty: (list) {
+        if (list.isEmpty) {
+          return ResponseModel(status: 0, message: "No Data", data: null);
+        }
+        return ResponseModel(status: 1, message: "Done", data: list);
+      },
+    );
+
+    if (result.isNotEmpty) {
+      allCategories = result.entries.first.value;
+      allProducts = result.entries.last.value;
+      print("📙 allCategories: ${allCategories?.first.name}");
+      print("📙 allProducts: ${allProducts?.length}");
+      update();
+    }
   }
 
 

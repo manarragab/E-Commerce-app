@@ -17,8 +17,9 @@ Widget cartWidget({
   double? height,
 }) {
   return Container(
+     margin: EdgeInsets.symmetric( vertical: 8.0),
+
     width: width ?? Get.width / 2.3,
-    height: Get.height / 2.8, // 👈 مهم جدًا
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(12),

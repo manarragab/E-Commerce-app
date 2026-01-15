@@ -140,6 +140,7 @@ Row(
         backgroundColor: Colors.redAccent,
         duration: const Duration(seconds: 2),
       );
+      print("Item already exists in wishlist");
     }
 
     print(homeController.wishlist);

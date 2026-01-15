@@ -143,9 +143,12 @@ static Widget floatingAppBar({
           //  padding: const EdgeInsets.symmetric(horizontal: 20),
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           padding: const EdgeInsets.symmetric(vertical: 12),
-          child: SvgPicture.asset(
-            "assets/svg/drawer.svg",
-          ),
+          child: SizedBox(),
+          
+          //  SvgPicture.asset(
+          //   "assets/svg/drawer.svg",
+          // ),
+          
         ),
       ),
     );

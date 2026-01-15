@@ -1,4 +1,5 @@
 import 'package:ecommerce_app/data/data_sources/get_storage.dart';
+import 'package:ecommerce_app/data/remote_data/dio_helper.dart';
 import 'package:ecommerce_app/features/auth/domain/cases/auth_case.dart';
 import 'package:ecommerce_app/features/auth/domain/controller/auth_controller.dart';
 import 'package:ecommerce_app/features/home/domain/controller/home_controller.dart';
@@ -31,8 +32,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     AuthController authController = Get.find<AuthController>();
-    HomeController homeController = Get.find<HomeController>();
-    PaymentController paymentController = Get.find<PaymentController>();
+  
+    
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 50),
@@ -45,10 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
             // ),
 
             // Top bar
-           MainButton(onPressed: (){
-            Get.toNamed(CustomPage.loginPage);
-           } , title: "Back",),
-
+          
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -60,36 +58,26 @@ class _SplashScreenState extends State<SplashScreen> {
                 LoadingOverLay(
                   showLoadingOnly: true,
                   child: GestureDetector(
-                    onTap: () async{
-                  controller.loadingGetxController.showLoading();
-                      //  Future.delayed(const Duration(seconds: 1), () {
-                        sPrint.info('getUser:: ${sl<AuthCases>().getToken() != null}');
-                        if ( sl<AuthCases>().getToken() != null) {
-                
-                //  await  authController.getUserInfo();
-                //  await  homeController.getAllCategories();
-                //  await  homeController.getAllProducts(); 
-            
-             await Future.wait(
-                  [
-                    homeController.getAllCategories(),
-                    homeController.getAllProducts(),
-                    authController.getUserInfo(),
-                  ],
-                );
-      Get.offAllNamed(CustomPage.homePage);
-                    controller.loadingGetxController.hideLoading();
+                    onTap: () async {
+  controller.loadingGetxController.showLoading();
+final success = await authController.refreshToken();
+if(sl<GetStorageData>().getToken() != null){
+await controller.openHomePage();
+       // Get.offAllNamed(CustomPage.homePage);
 
-                        } else {
-                         // Get.offAllNamed('/loginPage');
- 
-                  Get.offAllNamed(CustomPage.loginPage);
-                  controller.loadingGetxController.hideLoading();
+}
+else{
+if (success) {
+  await controller.openHomePage();
+} else {
+  Get.offAllNamed(CustomPage.loginPage);
+  controller.loadingGetxController.hideLoading();
+}
+}
 
-                        }
-                  
-                     // Get.toNamed(Cust/omPage.loginPage);
-                    },
+
+},
+
 
 
                     child:  Text("Skip", style:  TFonts.montFont(fontSize: 18))),
@@ -152,4 +140,5 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
+  
 }

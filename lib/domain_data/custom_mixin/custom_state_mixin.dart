@@ -94,6 +94,41 @@ mixin CustomStateMixin<T> on ListNotifierMixin {
   }
 }
 
+
+Future<Map<String, dynamic>> refreshDataMulti({
+  required List<Future<ResponseModel>> Function() futureMethods,
+  required RefreshController controller,
+  ResponseModel Function(List<ResponseModel> data)? checkIfEmpty,
+  Function(int)? getPage,
+}) async {
+  try {
+    change(null, status: RxStatus.loading());
+    controller.requestRefresh();
+
+    // ⬅️ نستقبل الاثنين API مع بعض
+    final List<ResponseModel> results = await Future.wait(futureMethods());
+
+    ResponseModel finalResult =
+        checkIfEmpty != null ? checkIfEmpty(results) : results.first;
+
+    controller.refreshCompleted();
+    change(finalResult.data, status: RxStatus.success());
+
+    // ⬅️ هنا بقى بنرجع موديلين
+    return {
+      "weather": results[0].data,
+      "forecast": results[1].data,
+    };
+
+  } catch (e) {
+    controller.refreshFailed();
+    change(null, status: RxStatus.error(e.toString()));
+    return {};
+  }
+}
+
+
+
   loadMoreData(
       {required dynamic model,
       required Future<ResponseModel> Function() futureMethod,

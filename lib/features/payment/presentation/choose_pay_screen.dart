@@ -1,4 +1,5 @@
 import 'package:ecommerce_app/data/const/export.dart';
+import 'package:ecommerce_app/features/home/domain/controller/home_controller.dart';
 import 'package:ecommerce_app/features/payment/domain/controller/payment_controller.dart';
 import 'package:ecommerce_app/features/payment/presentation/widget/alert_box.dart';
 import 'package:ecommerce_app/res/configuration/open_url/launch_url.dart';
@@ -23,16 +24,16 @@ class ChoosePayScreen extends StatelessWidget{
       LoadingOverLay(
         showLoadingOnly: true,
             id: "visa",
-      
+      key: Key("visaa"), 
         child: MainButton(
             onPressed: () async{
                  
               await controller.visaToken(idd: "visa");
-              final paymentToken = controller.paymentToken;    
+  //             final paymentToken = controller.paymentToken;    
             
-            if(paymentToken != null){
-  CustomLauncher.launchInBrowser(Uri.parse("https://accept.paymob.com/api/acceptance/iframes/957399?payment_token=$paymentToken"));
-            }
+  //           if(paymentToken != null){
+  // CustomLauncher.launchInBrowser(Uri.parse("https://accept.paymob.com/api/acceptance/iframes/957399?payment_token=$paymentToken"));
+  //           }
             },
             title: "Visa",
             width: 150,
@@ -48,20 +49,20 @@ class ChoosePayScreen extends StatelessWidget{
         LoadingOverLay(
           showLoadingOnly: true,
           id: "kiosk",
+           key: Key("kioskk"), 
           child: MainButton(
             onPressed: () async{
-               await controller.kioskToken(idd: "kiosk");
-               if(controller.paymentTokenKioskk != null){
-              await controller.kioskPayment(idd: "kiosk");
-      print("${controller.serviceCodeKiosk} kiosk");
+              //  await controller.kioskToken(idd: "kiosk");
+              //  if(controller.paymentTokenKioskk != null){
+              await controller.kioskToken(idd: "kiosk");
+      // print("${controller.serviceCodeKiosk} kiosk");
       if(controller.serviceCodeKiosk != null){
         Get.dialog(
+          
         AlertBox(txt: controller.serviceCodeKiosk.toString(),),
-
         );
       }
-               }
-               
+           
             },
             title: "Cash",
             width: 150,
@@ -77,11 +78,12 @@ class ChoosePayScreen extends StatelessWidget{
  LoadingOverLay(
           showLoadingOnly: true,
           id: "wallet",
+            //key: Key("wallett"),
           child: MainButton(
             onPressed: () async{
                await controller.walletToken(idd: "wallet");
                if(controller.paymentTokenWallet != null){
-              await controller.kioskPayment(idd: "wallet");
+            //  await controller.kioskPayment(idd: "wallet");
                  
                  print(controller.serviceCodeWallet);
                  if(controller.serviceCodeWallet != null){
@@ -105,7 +107,10 @@ class ChoosePayScreen extends StatelessWidget{
         ),
 Spacer(),
 MainButton(onPressed: (){
-  Get.toNamed(CustomPage.homePage);
+Get.find<HomeController>().selectedIndex=0;
+Get.offAllNamed(CustomPage.homePage);
+   controller.clearTextFields(); 
+   
 },
 title: "Go to home",
 ),

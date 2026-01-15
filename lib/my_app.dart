@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
         title: initData.title,
          theme: Context.getLightThemeData(),
         darkTheme: Context.getDarkThemeData(),
-        themeMode: controller.isDark ? ThemeMode.dark : ThemeMode.light,
+       themeMode: controller.isDark ? ThemeMode.dark : ThemeMode.light,
 
         // navigatorObservers: [ChuckerFlutter.navigatorObserver],
         initialBinding: GetBinding(),
